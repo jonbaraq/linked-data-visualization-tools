@@ -197,7 +197,6 @@ public class DashboardPresenter extends PagePresenter<DashboardPresenter.Display
             return;
         }
         mapPresenter.getDisplay().startProcessing();
-        Window.alert("Before dispatchAsync");
         dispatchAsync.execute(action, new AsyncCallback<ListResult<GeoResource>>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -208,8 +207,8 @@ public class DashboardPresenter extends PagePresenter<DashboardPresenter.Display
 
             @Override
             public void onSuccess(ListResult<GeoResource> result) {
-                Window.alert("En dashboard presenter: " + result.asList().size());
-                System.out.println("En dashboard presenter: " + result.asList().size());
+                System.out.println("Number of GeoResources to be presented: "
+                        + result.asList().size());
                 mapPresenter.drawGeoResouces(result.asList());
                 resultsPresenter.setResults(result.asList());
                 mapPresenter.getDisplay().stopProcessing();

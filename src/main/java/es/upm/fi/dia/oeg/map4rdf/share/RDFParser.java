@@ -51,17 +51,12 @@ import java.util.List;
  *
  * @author jonbaraq
  */
-public class RDFDisplayer {
+public class RDFParser {
 
     private static final String ENDPOINT_URL = "endpoint.url";
 
-    public static void parseAndDisplay(String filePath) {
-        List<GeoResource> geoResourcesList = parseRdfFile(filePath);
-
-    }
-
     public static List<GeoResource> parseRdfFile(String filePath) {
-        System.out.println("Parsing: " + filePath);
+        System.out.println("Parsing RDF file: " + filePath);
         // Create an empty model
         Model model = ModelFactory.createDefaultModel();
 
@@ -82,13 +77,11 @@ public class RDFDisplayer {
         QueryExecution qe = QueryExecutionFactory.create(query, model);
         ResultSet results = qe.execSelect();
 
-        // Output query results
-        // ResultSetFormatter.out(System.out, results, query);
-
         // TODO(jonbaraq): use location to restrict the query to the specifies geographic
         // area.
         HashMap<String, GeoResource> result = new HashMap<String, GeoResource>();
 
+        // TODO(jonathangsc): Remove this temporary georesources.
         GeoResource tmpResource = new GeoResource("http://otalex.linkeddata.es/resource/wgs84/103.09999999959689_-36.040000035081604",
                 new PointBean("http://otalex.linkeddata.es/resource/wgs84/103.09999999959689_-36.040000035081604", 103.930441749467672, -46.930441749467672));
         result.put("http://otalex.linkeddata.es/resource/wgs84/103.09999999959689_-36.040000035081604", tmpResource);
@@ -96,13 +89,21 @@ public class RDFDisplayer {
         tmpResource = new GeoResource("http://otalex.linkeddata.es/resource/wgs84/103.09999999959689_-36.040000035081604",
                 new PointBean("http://otalex.linkeddata.es/resource/wgs84/103.09999999959689_-36.040000035081604", 6862944.1, 646047.6));
         result.put("http://otalex.linkeddata.es/resource/wgs84/103.09999999959689_-36.04000003508", tmpResource);
+        
+        System.out.println("Before the while");
         while (results.hasNext()) {
+            System.out.println("Inside the while");
             QuerySolution solution = results.next();
             try {
                 String uri = solution.getResource("r").getURI();
                 String geoUri = solution.getResource("geo").getURI();
                 String geoTypeUri = solution.getResource("geoType").getURI();
+                System.out.println("Processing queryResult with \n"
+                        + "  uri: " + uri
+                        + "\n  geoUri:" + geoUri
+                        + "\n geoTypeUri:" + geoTypeUri);
                 GeoResource resource = result.get(uri);
+                // Just resources with new URIs are inserted into the map.
                 if (resource == null) {
                     try {
                         resource = new GeoResource(uri,
@@ -126,8 +127,10 @@ public class RDFDisplayer {
             } catch (Exception e) {
             }
         }
+        
         // Important - free up resources used running the query
         qe.close();
+        
         List<GeoResource> geoResources = new ArrayList<GeoResource>(result.values());
         System.out.println("Number of GEORESOURCES: " + geoResources.size());
         return new ArrayList<GeoResource>(result.values());

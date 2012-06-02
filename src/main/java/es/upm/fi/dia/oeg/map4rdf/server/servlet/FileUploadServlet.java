@@ -4,7 +4,7 @@
  */
 package es.upm.fi.dia.oeg.map4rdf.server.servlet;
 
-import es.upm.fi.dia.oeg.map4rdf.share.RDFDisplayer;
+import es.upm.fi.dia.oeg.map4rdf.share.RDFParser;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;

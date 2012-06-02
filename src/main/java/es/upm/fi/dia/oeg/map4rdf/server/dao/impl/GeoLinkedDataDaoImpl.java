@@ -82,7 +82,7 @@ public class GeoLinkedDataDaoImpl extends CommonDaoImpl implements Map4rdfDao {
         @Override
         public List<GeoResource> getGeoResources(String rdfFile)
                         throws DaoException {
-                return RDFDisplayer.parseRdfFile(rdfFile);
+                return RDFParser.parseRdfFile(rdfFile);
         }
 
 	private List<GeoResource> getGeoResources(BoundingBox boundingBox, Set<FacetConstraint> constraints, Integer max)

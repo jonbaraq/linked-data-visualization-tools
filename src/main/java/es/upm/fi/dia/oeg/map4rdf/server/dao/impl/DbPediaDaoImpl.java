@@ -52,7 +52,7 @@ import es.upm.fi.dia.oeg.map4rdf.share.FacetConstraint;
 import es.upm.fi.dia.oeg.map4rdf.share.GeoResource;
 import es.upm.fi.dia.oeg.map4rdf.share.GeoResourceOverlay;
 import es.upm.fi.dia.oeg.map4rdf.share.PointBean;
-import es.upm.fi.dia.oeg.map4rdf.share.RDFDisplayer;
+import es.upm.fi.dia.oeg.map4rdf.share.RDFParser;
 import es.upm.fi.dia.oeg.map4rdf.share.Resource;
 import es.upm.fi.dia.oeg.map4rdf.share.StatisticDefinition;
 import es.upm.fi.dia.oeg.map4rdf.share.Year;
@@ -121,7 +121,7 @@ public class DbPediaDaoImpl extends CommonDaoImpl implements Map4rdfDao {
         @Override
         public List<GeoResource> getGeoResources(String rdfFile)
                         throws DaoException {
-                return RDFDisplayer.parseRdfFile(rdfFile);
+                return RDFParser.parseRdfFile(rdfFile);
         }
 
 	@Override

@@ -77,6 +77,7 @@ public final class ShapeFilesPresenter
         getDisplay().getSubmitUrlButton().addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
+                form.setEncoding(FormPanel.ENCODING_URLENCODED);
                 form.submit();
             }
         });
@@ -84,6 +85,7 @@ public final class ShapeFilesPresenter
         getDisplay().getSubmitUploadButton().addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
+                form.setEncoding(FormPanel.ENCODING_MULTIPART);
                 form.submit();
             }
         });

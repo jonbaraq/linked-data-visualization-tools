@@ -75,8 +75,7 @@ public class ShapeFilesView extends Composite implements ShapeFilesPresenter.Dis
     private Widget createFormUploadUi() {
         formUpload.setAction("./upload");
         // Because we're going to add a FileUpload widget, we'll need to set the
-        // form to use the POST method, and multipart MIME encoding.
-        formUpload.setEncoding(FormPanel.ENCODING_MULTIPART);
+        // form to use the POST method.
         formUpload.setMethod(FormPanel.METHOD_POST);
         panel = new FlowPanel();
         formUpload.setWidget(panel);

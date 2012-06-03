@@ -16,6 +16,7 @@ import java.util.zip.ZipFile;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -47,27 +48,12 @@ public class FileUploadServlet extends HttpServlet {
             throws ServletException, IOException {  
         // Process only multipart requests
         if (ServletFileUpload.isMultipartContent(req)) {
-            // Create a factory for disk-based file items
-            FileItemFactory factory = new DiskFileItemFactory();
-
-            // Create a new file upload handler
-            ServletFileUpload upload = new ServletFileUpload(factory);
-            List<FileItem> items = new ArrayList<FileItem>();
-            try {
-                items = upload.parseRequest(req);
-            } catch (FileUploadException ex) {
-                Logger.getLogger(FileUploadServlet.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
-            if (!req.getParameter("urlShapeFile").isEmpty()) {
-                processUrl(req.getParameter("urlShapeFile"), resp);
-            } else {
-                processFileUpload(items, resp);
-            }
-  
+            processFileUpload(req, resp);
         } else {
-                resp.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE,
-                        "Request contents type is not supported by the servlet.");
+            String paramValue = req.getParameter("urlShapeFile");
+            if (paramValue != null && !paramValue.isEmpty()) {
+                processUrl(paramValue, resp);
+            }
         }
     }
     
@@ -113,17 +99,21 @@ public class FileUploadServlet extends HttpServlet {
         resp.flushBuffer();
     }
     
-    private void processFileUpload(List<FileItem> items, HttpServletResponse resp)
-            throws ServletException, IOException {   
+    private void processFileUpload(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        // Create a factory for disk-based file items
+        FileItemFactory factory = new DiskFileItemFactory();
+
+        // Create a new file upload handler
+        ServletFileUpload upload = new ServletFileUpload(factory);
+
         // Parse the request.
         try {  
-            System.out.println("Antes del for size del list: " + items.size());
-            System.out.println("ParameterNames");
-            ///for(Enumeration e = req.getParameterNames(); e.hasMoreElements(); ){
-            //    System.out.println(e.nextElement());
-            //}
+            List<FileItem> items = upload.parseRequest(req);
+            
+
+            
             for (FileItem fileItem : items) {
-                System.out.println("dentro del for");
                 // Process only file upload
                 if (fileItem.isFormField()) {
                     continue;
@@ -141,13 +131,13 @@ public class FileUploadServlet extends HttpServlet {
                     System.out.println("Escribir fichero .zip");
                     fileItem.write(uploadedFile);
                     System.out.println("Fichero escrito");
-                    String configurationFile =
+                    /**String configurationFile =
                             unzipFile(uploadedFile.getAbsolutePath());
                     resp.setStatus(HttpServletResponse.SC_CREATED);
                     resp.getWriter().print(
                             "The files were created successfully: "
                             + configurationFile);
-                    resp.flushBuffer();
+                    resp.flushBuffer();*/
                 } else {
                     throw new IOException(
                             "The file already exists in repository.");

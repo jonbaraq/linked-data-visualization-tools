@@ -69,6 +69,8 @@ public class RDFParser {
 
         // Read the RDF/XML file
         model.read(in, null);
+        
+        System.out.println("Model to String: " + model.toString());
 
         String queryString = createGetResourcesQuery();
         Query query = QueryFactory.create(queryString);
@@ -76,6 +78,7 @@ public class RDFParser {
         // Execute the query and obtain results
         QueryExecution qe = QueryExecutionFactory.create(query, model);
         ResultSet results = qe.execSelect();
+        System.out.println("Results:" + results.hasNext());
 
         // TODO(jonbaraq): use location to restrict the query to the specifies geographic
         // area.

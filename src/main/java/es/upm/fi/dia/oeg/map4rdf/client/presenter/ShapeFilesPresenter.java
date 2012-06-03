@@ -47,9 +47,11 @@ public final class ShapeFilesPresenter
 
         public void clear();
 
-        public Button getSubmitButton();
+        public Button getSubmitUploadButton();
+        
+        public Button getSubmitUrlButton();
 
-        public FormPanel getForm();
+        public FormPanel getFormUpload();
     }
     private final DispatchAsync dispatchAsync;
     private MapPresenter mapPresenter;
@@ -69,8 +71,16 @@ public final class ShapeFilesPresenter
      */
     @Override
     protected void onBind() {
-        final FormPanel form = getDisplay().getForm();
-        getDisplay().getSubmitButton().addClickHandler(new ClickHandler() {
+        final FormPanel form = getDisplay().getFormUpload();
+        
+        getDisplay().getSubmitUrlButton().addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                form.submit();
+            }
+        });
+        
+        getDisplay().getSubmitUploadButton().addClickHandler(new ClickHandler() {
 
             @Override
             public void onClick(ClickEvent event) {

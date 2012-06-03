@@ -22,12 +22,7 @@
  */
 package es.upm.fi.dia.oeg.map4rdf.client.view;
 
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FileUpload;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FormPanel;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
 import com.google.inject.Inject;
 
 import es.upm.fi.dia.oeg.map4rdf.client.presenter.ShapeFilesPresenter;
@@ -41,16 +36,17 @@ public class ShapeFilesView extends Composite implements ShapeFilesPresenter.Dis
 
     private final BrowserMessages messages;
     private final BrowserResources resources;
-    final FormPanel form = new FormPanel();
+    final FormPanel formUpload = new FormPanel();
     private FlowPanel panel;
     private FileUpload fileUpload;
-    private Button submitButton;
+    private Button submitUrlButton;
+    private Button submitUploadButton;
 
     @Inject
     public ShapeFilesView(BrowserMessages messages, BrowserResources resources) {
         this.resources = resources;
         this.messages = messages;
-        initWidget(createUi());
+        initWidget(createFormUploadUi());
     }
 
 
@@ -75,24 +71,34 @@ public class ShapeFilesView extends Composite implements ShapeFilesPresenter.Dis
     /*
      * ---------------- helper methods --
      */
-    private Widget createUi() {
-        form.setAction("./upload");
-
+   
+    private Widget createFormUploadUi() {
+        formUpload.setAction("./upload");
         // Because we're going to add a FileUpload widget, we'll need to set the
         // form to use the POST method, and multipart MIME encoding.
-        form.setEncoding(FormPanel.ENCODING_MULTIPART);
-        form.setMethod(FormPanel.METHOD_POST);
+        formUpload.setEncoding(FormPanel.ENCODING_MULTIPART);
+        formUpload.setMethod(FormPanel.METHOD_POST);
         panel = new FlowPanel();
-        form.setWidget(panel);
+        formUpload.setWidget(panel);
 
         fileUpload = new FileUpload();
         fileUpload.setName("uploadFormElement");
-        submitButton = new Button("Upload and display");
-
+        submitUploadButton = new Button("Upload and display");
+        
+        panel.add(new Label("URL to shapefiles:"));
+        TextBox urlShapeFile = new TextBox();
+        urlShapeFile.setName("urlShapeFile");
+        panel.add(urlShapeFile);
+        submitUrlButton = new Button("Submit URL and display");
+        panel.add(submitUrlButton);
+        
+        panel.add(new Label("\n--------------------\n"));
+        panel.add(new Label("Select the zip file with the shapefiles you "
+                + "want to display."));
         panel.add(fileUpload);
-        panel.add(submitButton);
+        panel.add(submitUploadButton);
 
-        return form;
+        return formUpload;
     }
 
     @Override
@@ -101,13 +107,18 @@ public class ShapeFilesView extends Composite implements ShapeFilesPresenter.Dis
     }
 
     @Override
-    public Button getSubmitButton() {
-        return this.submitButton;
+    public Button getSubmitUploadButton() {
+        return this.submitUploadButton;
+    }
+    
+    @Override
+    public Button getSubmitUrlButton() {
+        return this.submitUrlButton;
     }
 
     @Override
-    public FormPanel getForm() {
-        return this.form;
+    public FormPanel getFormUpload() {
+        return this.formUpload;
     }
     
 }

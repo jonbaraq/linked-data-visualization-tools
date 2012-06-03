@@ -58,7 +58,8 @@ public final class ShapeFilesPresenter
 
     @Inject
     public ShapeFilesPresenter(
-            ShapeFilesPresenter.Display display, EventBus eventBus, DispatchAsync dispatchAsync,
+            ShapeFilesPresenter.Display display,
+            EventBus eventBus, DispatchAsync dispatchAsync,
             MapPresenter mapPresenter) {
         super(display, eventBus);
         this.dispatchAsync = dispatchAsync;
@@ -81,7 +82,6 @@ public final class ShapeFilesPresenter
         });
         
         getDisplay().getSubmitUploadButton().addClickHandler(new ClickHandler() {
-
             @Override
             public void onClick(ClickEvent event) {
                 form.submit();
@@ -89,7 +89,6 @@ public final class ShapeFilesPresenter
         });
 
         form.addSubmitHandler(new FormPanel.SubmitHandler() {
-
             @Override
             public void onSubmit(SubmitEvent event) {
                 // Window.alert("Submitting!");
@@ -97,7 +96,6 @@ public final class ShapeFilesPresenter
         });
 
         form.addSubmitCompleteHandler(new FormPanel.SubmitCompleteHandler() {
-
             @Override
             public void onSubmitComplete(SubmitCompleteEvent event) {
                 String message = event.getResults().split(">")[1].split("<")[0];

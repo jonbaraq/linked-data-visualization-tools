@@ -46,17 +46,18 @@ public class FileUploadServlet extends HttpServlet {
         if (!tempDir.exists()) {
             tempDir.mkdirs();
         }
-        // Process only multipart requests
-        if (ServletFileUpload.isMultipartContent(req)) {
-            if (req.getParameter("urlShapeFile") != null
-                    && !req.getParameter("urlShapeFile").isEmpty()) {
-                processUrl(req.getParameter("urlShapeFile"), resp);
-            } else {
-                processFileUpload(req, resp);
-            }
+        
+        if (req.getParameter("urlShapeFile") != null
+                && !req.getParameter("urlShapeFile").isEmpty()) {
+            processUrl(req.getParameter("urlShapeFile"), resp);
         } else {
-            resp.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE,
-                    "Request contents type is not supported by the servlet.");
+            // Process only multipart requests
+            if (ServletFileUpload.isMultipartContent(req)) {
+                processFileUpload(req, resp);
+            } else {
+                resp.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE,
+                        "Request contents type is not supported by the servlet.");
+            }
         }
     }
     
@@ -66,7 +67,8 @@ public class FileUploadServlet extends HttpServlet {
         
         Map<String, String> filesToDownloadMap = getFilesToDownload(url);
         
-        File directory = new File(uploadDirectory + "/" + getDirectoryName(filesToDownloadMap));
+        File directory = new File(uploadDirectory + "/" + getDirectoryName(
+                filesToDownloadMap));
         if (directory == null) {
              throw new IOException("The files cannot be downloaded."
                      + " Files on the repository don't have the right naming.");
@@ -103,7 +105,6 @@ public class FileUploadServlet extends HttpServlet {
     
     private void processFileUpload(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {        
-        System.out.println("Subiendo fichero a la plataforma");
         // Create a factory for disk-based file items
         FileItemFactory factory = new DiskFileItemFactory();
 
@@ -115,6 +116,12 @@ public class FileUploadServlet extends HttpServlet {
             List<FileItem> items = upload.parseRequest(req);
             System.out.println("Antes del for size del list: " + items.size());
             System.out.println("Req: " + req.getParameter("uploadFormElement"));
+            System.out.println("Debugging: " + req.toString());
+            // System.out.println("" + req.)
+            System.out.println("ParameterNames");
+            for(Enumeration e = req.getParameterNames(); e.hasMoreElements(); ){
+                System.out.println(e.nextElement());
+            }
             for (FileItem fileItem : items) {
                 System.out.println("dentro del for");
                 // Process only file upload

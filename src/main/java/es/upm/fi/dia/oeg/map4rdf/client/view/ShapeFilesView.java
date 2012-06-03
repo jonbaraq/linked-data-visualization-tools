@@ -80,11 +80,8 @@ public class ShapeFilesView extends Composite implements ShapeFilesPresenter.Dis
         formUpload.setMethod(FormPanel.METHOD_POST);
         panel = new FlowPanel();
         formUpload.setWidget(panel);
-
-        fileUpload = new FileUpload();
-        fileUpload.setName("uploadFormElement");
-        submitUploadButton = new Button("Upload and display");
         
+        // Add the section to put the URL to download shapefiles.
         panel.add(new Label("URL to shapefiles:"));
         TextBox urlShapeFile = new TextBox();
         urlShapeFile.setName("urlShapeFile");
@@ -92,10 +89,14 @@ public class ShapeFilesView extends Composite implements ShapeFilesPresenter.Dis
         submitUrlButton = new Button("Submit URL and display");
         panel.add(submitUrlButton);
         
+
         panel.add(new Label("\n--------------------\n"));
         panel.add(new Label("Select the zip file with the shapefiles you "
                 + "want to display."));
+        fileUpload = new FileUpload();
+        fileUpload.setName("uploadFormElement");
         panel.add(fileUpload);
+        submitUploadButton = new Button("Upload and display");
         panel.add(submitUploadButton);
 
         return formUpload;

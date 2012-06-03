@@ -109,10 +109,7 @@ public class FileUploadServlet extends HttpServlet {
 
         // Parse the request.
         try {  
-            List<FileItem> items = upload.parseRequest(req);
-            
-
-            
+            List<FileItem> items = upload.parseRequest(req);          
             for (FileItem fileItem : items) {
                 // Process only file upload
                 if (fileItem.isFormField()) {

@@ -8,6 +8,8 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -17,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
@@ -41,23 +44,30 @@ public class FileUploadServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        File tempDir = getTempDir();
-        if (!tempDir.exists()) {
-            tempDir.mkdirs();
-        }
-        
-        if (req.getParameter("urlShapeFile") != null
-                && !req.getParameter("urlShapeFile").isEmpty()) {
-            processUrl(req.getParameter("urlShapeFile"), resp);
-        } else {
-            // Process only multipart requests
-            if (ServletFileUpload.isMultipartContent(req)) {
-                processFileUpload(req, resp);
+            throws ServletException, IOException {  
+        // Process only multipart requests
+        if (ServletFileUpload.isMultipartContent(req)) {
+            // Create a factory for disk-based file items
+            FileItemFactory factory = new DiskFileItemFactory();
+
+            // Create a new file upload handler
+            ServletFileUpload upload = new ServletFileUpload(factory);
+            List<FileItem> items = new ArrayList<FileItem>();
+            try {
+                items = upload.parseRequest(req);
+            } catch (FileUploadException ex) {
+                Logger.getLogger(FileUploadServlet.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            if (!req.getParameter("urlShapeFile").isEmpty()) {
+                processUrl(req.getParameter("urlShapeFile"), resp);
             } else {
+                processFileUpload(items, resp);
+            }
+  
+        } else {
                 resp.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE,
                         "Request contents type is not supported by the servlet.");
-            }
         }
     }
     
@@ -103,25 +113,15 @@ public class FileUploadServlet extends HttpServlet {
         resp.flushBuffer();
     }
     
-    private void processFileUpload(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {        
-        // Create a factory for disk-based file items
-        FileItemFactory factory = new DiskFileItemFactory();
-
-        // Create a new file upload handler
-        ServletFileUpload upload = new ServletFileUpload(factory);
-
-        // Parse the request
-        try {
-            List<FileItem> items = upload.parseRequest(req);
+    private void processFileUpload(List<FileItem> items, HttpServletResponse resp)
+            throws ServletException, IOException {   
+        // Parse the request.
+        try {  
             System.out.println("Antes del for size del list: " + items.size());
-            System.out.println("Req: " + req.getParameter("uploadFormElement"));
-            System.out.println("Debugging: " + req.toString());
-            // System.out.println("" + req.)
             System.out.println("ParameterNames");
-            for(Enumeration e = req.getParameterNames(); e.hasMoreElements(); ){
-                System.out.println(e.nextElement());
-            }
+            ///for(Enumeration e = req.getParameterNames(); e.hasMoreElements(); ){
+            //    System.out.println(e.nextElement());
+            //}
             for (FileItem fileItem : items) {
                 System.out.println("dentro del for");
                 // Process only file upload
@@ -161,10 +161,6 @@ public class FileUploadServlet extends HttpServlet {
                     + e.getMessage());
         }
    
-    }
-
-    private File getTempDir() {
-        return new File(DEFAULT_TEMP_DIR);
     }
     
     private String unzipFile(String filePath) {

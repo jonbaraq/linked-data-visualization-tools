@@ -89,7 +89,6 @@ public class ShapeFilesView extends Composite implements ShapeFilesPresenter.Dis
         submitUrlButton = new Button("Submit URL and display");
         panel.add(submitUrlButton);
         
-
         panel.add(new Label("\n--------------------\n"));
         panel.add(new Label("Select the zip file with the shapefiles you "
                 + "want to display."));

@@ -8,6 +8,8 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -65,11 +67,20 @@ public class FileUploadServlet extends HttpServlet {
         Map<String, String> filesToDownloadMap = getFilesToDownload(url);
         
         File directory = new File(uploadDirectory + "/" + getDirectoryName(filesToDownloadMap));
+        if (directory == null) {
+             throw new IOException("The files cannot be downloaded."
+                     + " Files on the repository don't have the right naming.");
+        }
+
         directory.mkdirs();
         
         for (String key : filesToDownloadMap.keySet()) {
             BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
                     directory.getAbsolutePath() + "/" + filesToDownloadMap.get(key))));
+            if (filesToDownloadMap.get(key).equals(SHAPE_FILE_CONFIGURATION_FILE)) {
+                bw = new BufferedWriter(new FileWriter(new File(
+                    uploadDirectory + "/" + filesToDownloadMap.get(key))));
+            }
             
             // Download the file from the repository.
             String line;
@@ -83,10 +94,16 @@ public class FileUploadServlet extends HttpServlet {
             bw.close();
         }
 
+        resp.setStatus(HttpServletResponse.SC_CREATED);
+        resp.getWriter().print("The files were created successfully: "
+                + directory.getAbsolutePath()
+                + "/" + SHAPE_FILE_CONFIGURATION_FILE);
+        resp.flushBuffer();
     }
     
     private void processFileUpload(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {      
+            throws ServletException, IOException {        
+        System.out.println("Subiendo fichero a la plataforma");
         // Create a factory for disk-based file items
         FileItemFactory factory = new DiskFileItemFactory();
 
@@ -96,13 +113,17 @@ public class FileUploadServlet extends HttpServlet {
         // Parse the request
         try {
             List<FileItem> items = upload.parseRequest(req);
+            System.out.println("Antes del for size del list: " + items.size());
+            System.out.println("Req: " + req.getParameter("uploadFormElement"));
             for (FileItem fileItem : items) {
+                System.out.println("dentro del for");
                 // Process only file upload
                 if (fileItem.isFormField()) {
                     continue;
                 }
 
                 String fileName = fileItem.getName();
+                System.out.println("Filename: " + fileName);
                 // Get only the file name not whole path
                 if (fileName != null) {
                     fileName = FilenameUtils.getName(fileName);
@@ -110,11 +131,15 @@ public class FileUploadServlet extends HttpServlet {
 
                 File uploadedFile = new File(createDirectory(), fileName);
                 if (uploadedFile.createNewFile()) {
+                    System.out.println("Escribir fichero .zip");
                     fileItem.write(uploadedFile);
+                    System.out.println("Fichero escrito");
+                    String configurationFile =
+                            unzipFile(uploadedFile.getAbsolutePath());
                     resp.setStatus(HttpServletResponse.SC_CREATED);
                     resp.getWriter().print(
-                            "The file was created successfully: "
-                            + uploadedFile.getAbsolutePath());
+                            "The files were created successfully: "
+                            + configurationFile);
                     resp.flushBuffer();
                 } else {
                     throw new IOException(
@@ -122,6 +147,8 @@ public class FileUploadServlet extends HttpServlet {
                 }
             }
         } catch (Exception e) {
+            System.out.println("An error occurred while creating the file : "
+                    + e.getMessage());
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     "An error occurred while creating the file : "
                     + e.getMessage());
@@ -131,6 +158,46 @@ public class FileUploadServlet extends HttpServlet {
 
     private File getTempDir() {
         return new File(DEFAULT_TEMP_DIR);
+    }
+    
+    private String unzipFile(String filePath) {
+        Enumeration entries;
+        ZipFile zipFile;
+
+        try {
+            zipFile = new ZipFile(filePath);
+            entries = zipFile.entries();
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = (ZipEntry) entries.nextElement();
+                if (entry.isDirectory()) {
+                    // Assume directories are stored parents first then children.
+                    System.err.println("Extracting directory: " + entry.getName());
+                    // This is not robust, just for demonstration purposes.
+                    (new File(entry.getName())).mkdir();
+                    continue;
+                }
+                System.err.println("Extracting file: " + entry.getName());
+                copyInputStream(zipFile.getInputStream(entry),
+                        new BufferedOutputStream(new FileOutputStream(entry.getName())));
+            }
+            zipFile.close();
+        } catch (IOException ioe) {
+            System.err.println("Unhandled exception:");
+            ioe.printStackTrace();
+        }
+        
+        return "";
+    }
+    
+    public void copyInputStream(InputStream in, OutputStream out)
+            throws IOException {
+        byte[] buffer = new byte[1024];
+        int len;
+        while ((len = in.read(buffer)) >= 0) {
+            out.write(buffer, 0, len);
+        }
+        in.close();
+        out.close();
     }
     
     private String createDirectory() {
@@ -197,8 +264,8 @@ public class FileUploadServlet extends HttpServlet {
     private String getDirectoryName(Map<String, String> map) {
         for (String key : map.keySet()) {
             if (!map.get(key).equals(SHAPE_FILE_CONFIGURATION_FILE)) {
-                System.out.println("Directory Name: " + map.get(key));
-                return map.get(key).split(".")[0];
+                // Return the name without the extension of the file.
+                return map.get(key).substring(0, map.get(key).length() - 4);
             }
         }
         return null;

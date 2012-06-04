@@ -117,24 +117,22 @@ public class FileUploadServlet extends HttpServlet {
                 }
 
                 String fileName = fileItem.getName();
-                System.out.println("Filename: " + fileName);
                 // Get only the file name not whole path
                 if (fileName != null) {
                     fileName = FilenameUtils.getName(fileName);
                 }
 
-                File uploadedFile = new File(createDirectory(), fileName);
+                String uploadDirectory = createDirectory();
+                File uploadedFile = new File(uploadDirectory, fileName);
                 if (uploadedFile.createNewFile()) {
-                    System.out.println("Escribir fichero .zip");
                     fileItem.write(uploadedFile);
-                    System.out.println("Fichero escrito");
-                    /**String configurationFile =
-                            unzipFile(uploadedFile.getAbsolutePath());
+                    String configurationFile =
+                            unzipFile(uploadDirectory, fileName);
                     resp.setStatus(HttpServletResponse.SC_CREATED);
                     resp.getWriter().print(
                             "The files were created successfully: "
                             + configurationFile);
-                    resp.flushBuffer();*/
+                    resp.flushBuffer();
                 } else {
                     throw new IOException(
                             "The file already exists in repository.");
@@ -150,25 +148,25 @@ public class FileUploadServlet extends HttpServlet {
    
     }
     
-    private String unzipFile(String filePath) {
+    private String unzipFile(String uploadDirectory, String fileName) {
         Enumeration entries;
         ZipFile zipFile;
+        String configurationFile = "";
 
         try {
-            zipFile = new ZipFile(filePath);
+            zipFile = new ZipFile(uploadDirectory + "/" + fileName);
             entries = zipFile.entries();
             while (entries.hasMoreElements()) {
                 ZipEntry entry = (ZipEntry) entries.nextElement();
+                String filePath = uploadDirectory + "/" + entry.getName();
                 if (entry.isDirectory()) {
-                    // Assume directories are stored parents first then children.
-                    System.err.println("Extracting directory: " + entry.getName());
-                    // This is not robust, just for demonstration purposes.
-                    (new File(entry.getName())).mkdir();
+                    (new File(filePath)).mkdir();
                     continue;
                 }
-                System.err.println("Extracting file: " + entry.getName());
-                copyInputStream(zipFile.getInputStream(entry),
-                        new BufferedOutputStream(new FileOutputStream(entry.getName())));
+                copyInputStream(zipFile.getInputStream(entry), filePath);
+                if (entry.getName().equals(SHAPE_FILE_CONFIGURATION_FILE)) {
+                    configurationFile = filePath;
+                }
             }
             zipFile.close();
         } catch (IOException ioe) {
@@ -176,18 +174,22 @@ public class FileUploadServlet extends HttpServlet {
             ioe.printStackTrace();
         }
         
-        return "";
+        return configurationFile;
     }
     
-    public void copyInputStream(InputStream in, OutputStream out)
+    public void copyInputStream(InputStream in, String path)
             throws IOException {
-        byte[] buffer = new byte[1024];
-        int len;
-        while ((len = in.read(buffer)) >= 0) {
-            out.write(buffer, 0, len);
+        BufferedWriter bw = new BufferedWriter(new FileWriter(new File(path)));
+        
+        // Download the file from the repository.
+        String line;
+        BufferedReader br = new BufferedReader(new InputStreamReader(in));
+        
+        while ((line = br.readLine()) != null) {
+            bw.write(line);
+            bw.newLine();
         }
-        in.close();
-        out.close();
+        bw.close();
     }
     
     private String createDirectory() {

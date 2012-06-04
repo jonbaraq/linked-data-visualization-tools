@@ -60,6 +60,7 @@ public class FileUploadServlet extends HttpServlet {
     private void processUrl(String url, HttpServletResponse resp)
             throws ServletException, IOException {
         String uploadDirectory = createDirectory();
+        boolean configurationFound = false;
         
         Map<String, String> filesToDownloadMap = getFilesToDownload(url);
         
@@ -76,6 +77,7 @@ public class FileUploadServlet extends HttpServlet {
             BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
                     directory.getAbsolutePath() + "/" + filesToDownloadMap.get(key))));
             if (filesToDownloadMap.get(key).equals(SHAPE_FILE_CONFIGURATION_FILE)) {
+                configurationFound = true;
                 bw = new BufferedWriter(new FileWriter(new File(
                     uploadDirectory + "/" + filesToDownloadMap.get(key))));
             }
@@ -93,6 +95,10 @@ public class FileUploadServlet extends HttpServlet {
         }
 
         resp.setStatus(HttpServletResponse.SC_CREATED);
+        if (!configurationFound) {
+            resp.getWriter().print("Configuration file not found.");
+            resp.flushBuffer();
+        }
         resp.getWriter().print("The files were created successfully: "
                 + directory.getAbsolutePath()
                 + "/" + SHAPE_FILE_CONFIGURATION_FILE);
@@ -129,6 +135,12 @@ public class FileUploadServlet extends HttpServlet {
                     String configurationFile =
                             unzipFile(uploadDirectory, fileName);
                     resp.setStatus(HttpServletResponse.SC_CREATED);
+                    if (configurationFile.isEmpty()) {
+                        resp.getWriter().print(
+                                "Configuration file not found.");
+                        resp.flushBuffer();
+                        return;
+                    }
                     resp.getWriter().print(
                             "The files were created successfully: "
                             + configurationFile);
@@ -164,7 +176,7 @@ public class FileUploadServlet extends HttpServlet {
                     continue;
                 }
                 copyInputStream(zipFile.getInputStream(entry), filePath);
-                if (entry.getName().equals(SHAPE_FILE_CONFIGURATION_FILE)) {
+                if (entry.getName().endsWith(SHAPE_FILE_CONFIGURATION_FILE)) {
                     configurationFile = filePath;
                 }
             }

@@ -31,18 +31,18 @@ import es.upm.fi.dia.oeg.map4rdf.share.BoundingBox;
 import es.upm.fi.dia.oeg.map4rdf.share.FacetConstraint;
 
 /**
- * @author Jonathan Gonzalez
+ * @author Jonathan Gonzalez (jonathan@jonbaraq.eu)
  */
-public class GetGeoResourcesFromRdfFileBase implements Serializable {
+public class GetGeoResourcesFromRdfModelBase implements Serializable {
 
 	private BoundingBox boundingBox;
-	private String rdfFile;
+	private String modelConfiguration;
 
-	GetGeoResourcesFromRdfFileBase() {
+	GetGeoResourcesFromRdfModelBase() {
 		// for serialization
 	}
 
-	public GetGeoResourcesFromRdfFileBase(BoundingBox boundingBox) {
+	public GetGeoResourcesFromRdfModelBase(BoundingBox boundingBox) {
 		this.boundingBox = boundingBox;
 	}
 
@@ -50,12 +50,12 @@ public class GetGeoResourcesFromRdfFileBase implements Serializable {
 		return boundingBox;
 	}
 
-	public String getRdfFile() {
-		return rdfFile;
+	public String getModelConfiguration() {
+		return modelConfiguration;
 	}
 
-	public void setRdfFile(String rdfFile) {
-		this.rdfFile = rdfFile;
+	public void setModelConfiguration(String modelConfiguration) {
+		this.modelConfiguration = modelConfiguration;
 	}
 
 }

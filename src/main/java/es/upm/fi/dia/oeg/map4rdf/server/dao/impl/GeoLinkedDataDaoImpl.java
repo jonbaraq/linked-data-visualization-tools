@@ -80,9 +80,9 @@ public class GeoLinkedDataDaoImpl extends CommonDaoImpl implements Map4rdfDao {
 	}
         
         @Override
-        public List<GeoResource> getGeoResources(String rdfFile)
+        public List<GeoResource> getGeoResources(String modelConfiguration)
                         throws DaoException {
-                return RDFParser.parseRdfFile(rdfFile);
+                return RDFModelProcessor.parseRdfFile(modelConfiguration);
         }
 
 	private List<GeoResource> getGeoResources(BoundingBox boundingBox, Set<FacetConstraint> constraints, Integer max)

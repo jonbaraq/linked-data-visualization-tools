@@ -30,7 +30,7 @@ import es.upm.fi.dia.oeg.map4rdf.client.resource.BrowserMessages;
 import es.upm.fi.dia.oeg.map4rdf.client.resource.BrowserResources;
 
 /**
- * @author Jonathan Gonzalez
+ * @author Jonathan Gonzalez (jonathan@jonbaraq.eu)
  */
 public class ShapeFilesView extends Composite implements ShapeFilesPresenter.Display {
 
@@ -71,11 +71,11 @@ public class ShapeFilesView extends Composite implements ShapeFilesPresenter.Dis
     /*
      * ---------------- helper methods --
      */
-   
     private Widget createFormUploadUi() {
+        // Servlet action.
         formUpload.setAction("./upload");
-        // Because we're going to add a FileUpload widget, we'll need to set the
-        // form to use the POST method.
+        
+        // FileUpload widget needs to be a POST method.
         formUpload.setMethod(FormPanel.METHOD_POST);
         panel = new FlowPanel();
         formUpload.setWidget(panel);

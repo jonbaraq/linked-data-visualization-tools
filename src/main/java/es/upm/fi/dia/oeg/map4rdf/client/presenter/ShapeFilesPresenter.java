@@ -24,6 +24,7 @@ package es.upm.fi.dia.oeg.map4rdf.client.presenter;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
@@ -37,7 +38,7 @@ import net.customware.gwt.presenter.client.EventBus;
 import net.customware.gwt.presenter.client.widget.WidgetDisplay;
 
 /**
- * @author Jonathan Gonzalez
+ * @author Jonathan Gonzalez (jonathan@jonbaraq.eu)
  */
 @Singleton
 public final class ShapeFilesPresenter
@@ -85,6 +86,8 @@ public final class ShapeFilesPresenter
         getDisplay().getSubmitUploadButton().addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
+                // The form needs to be multipart for the section that uploads
+                // the zip file.
                 form.setEncoding(FormPanel.ENCODING_MULTIPART);
                 form.submit();
             }
@@ -93,6 +96,8 @@ public final class ShapeFilesPresenter
         form.addSubmitHandler(new FormPanel.SubmitHandler() {
             @Override
             public void onSubmit(SubmitEvent event) {
+                // TODO(jonathangsc): Check if any action here is desired to
+                // notify the user.
                 // Window.alert("Submitting!");
             }
         });
@@ -105,6 +110,10 @@ public final class ShapeFilesPresenter
                 if (message.contains("successfully")) {
                     fileName = message.split(": ")[1];
                     eventBus.fireEvent(new ShapeFilesChangedEvent(fileName));
+                } else {
+                    // In case the upload / download is not successful,
+                    // the error message should be displayed to the user.
+                    Window.alert(message);
                 }
             }
         });

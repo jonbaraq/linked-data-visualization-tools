@@ -34,7 +34,7 @@ public class BrowserActionHandlerModule extends ActionHandlerModule {
 	@Override
 	protected void configureHandlers() {
 		bindHandler(GetGeoResourcesHandler.class);
-                bindHandler(GetGeoResourcesFromRdfFileHandler.class);
+                bindHandler(GetGeoResourcesFromRdfModelHandler.class);
 		bindHandler(GetFacetDefinitionsHandler.class);
                 bindHandler(GetGeoResourceOverlaysHandler.class);
 		bindHandler(GetStatisticYearsHandler.class);
@@ -43,7 +43,7 @@ public class BrowserActionHandlerModule extends ActionHandlerModule {
 		bindHandler(GetSubjectDescriptionsHandler.class);
 		bindHandler(GetSubjectLabelHandler.class);
 		bindHandler(GetGeoResourcesAsKmlUrlHandler.class);
-		bindHandler(SaveRdfFIleHandler.class);
+		bindHandler(SaveRdfFileHandler.class);
 		bindHandler(GetConfigurationParameterHandler.class);
 	}
 }

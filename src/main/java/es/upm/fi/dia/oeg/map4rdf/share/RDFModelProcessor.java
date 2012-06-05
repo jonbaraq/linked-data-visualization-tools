@@ -47,11 +47,11 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Parses and displays RDF files into the map layer.
+ * Processes RDF models and returns GeoResources to be displayed in a map.
  *
- * @author jonbaraq
+ * @author Jonathan Gonzalez (jonathan@jonbaraq.eu)
  */
-public class RDFParser {
+public class RDFModelProcessor {
 
     private static final String ENDPOINT_URL = "endpoint.url";
 

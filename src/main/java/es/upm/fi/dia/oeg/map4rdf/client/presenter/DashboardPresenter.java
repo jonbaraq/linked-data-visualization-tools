@@ -108,7 +108,7 @@ public class DashboardPresenter extends PagePresenter<DashboardPresenter.Display
         // Remove this line if we don't want to clear the map.
         mapPresenter.clear();
         resultsPresenter.clear();
-        loadGeoResources(mapPresenter.getVisibleBox(), event.getRdfFile());
+        loadGeoResources(mapPresenter.getVisibleBox(), event.getModelConfiguration());
     }
     
     @Override
@@ -188,10 +188,10 @@ public class DashboardPresenter extends PagePresenter<DashboardPresenter.Display
 
     /* --------------- helper methods --- */
     void loadGeoResources(BoundingBox boundingBox, String rdfFile) {
-        GetGeoResourcesFromRdfFile action =
-                new GetGeoResourcesFromRdfFile(boundingBox);
+        GetGeoResourcesFromRdfModel action =
+                new GetGeoResourcesFromRdfModel(boundingBox);
         if (rdfFile != null && !rdfFile.isEmpty()) {
-            action.setRdfFile(rdfFile);
+            action.setModelConfiguration(rdfFile);
         } else {
             Window.alert("ShapeFile could not be displayed");
             return;

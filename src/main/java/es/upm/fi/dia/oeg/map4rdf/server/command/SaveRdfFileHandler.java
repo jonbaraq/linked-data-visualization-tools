@@ -63,7 +63,7 @@ import es.upm.fi.dia.oeg.map4rdf.share.conf.ParameterNames;
  * @author Filip
  */
 
-public class SaveRdfFIleHandler implements
+public class SaveRdfFileHandler implements
 		ActionHandler<SaveRdfFile, SingletonResult<String> > {
 
 	private ServletContext servletContext;
@@ -75,7 +75,7 @@ public class SaveRdfFIleHandler implements
 	}
 	
 	@Inject
-	public SaveRdfFIleHandler(Provider<ServletContext> provider) {
+	public SaveRdfFileHandler(Provider<ServletContext> provider) {
 		super();
 		servletContext = provider.get();
 		InputStream propIn = servletContext.getResourceAsStream(Constants.CONFIGURATION_FILE);

@@ -72,6 +72,10 @@ public class RDFModelProcessor {
         
         System.out.println("Model to String: " + model.toString());
 
+        return processRdfModel(model);
+    }
+    
+    public static List<GeoResource> processRdfModel(Model model) {
         String queryString = createGetResourcesQuery();
         Query query = QueryFactory.create(queryString);
 
@@ -84,16 +88,6 @@ public class RDFModelProcessor {
         // area.
         HashMap<String, GeoResource> result = new HashMap<String, GeoResource>();
 
-        // TODO(jonathangsc): Remove this temporary georesources.
-        GeoResource tmpResource = new GeoResource("http://otalex.linkeddata.es/resource/wgs84/103.09999999959689_-36.040000035081604",
-                new PointBean("http://otalex.linkeddata.es/resource/wgs84/103.09999999959689_-36.040000035081604", 103.930441749467672, -46.930441749467672));
-        result.put("http://otalex.linkeddata.es/resource/wgs84/103.09999999959689_-36.040000035081604", tmpResource);
-        
-        tmpResource = new GeoResource("http://otalex.linkeddata.es/resource/wgs84/103.09999999959689_-36.040000035081604",
-                new PointBean("http://otalex.linkeddata.es/resource/wgs84/103.09999999959689_-36.040000035081604", 6862944.1, 646047.6));
-        result.put("http://otalex.linkeddata.es/resource/wgs84/103.09999999959689_-36.04000003508", tmpResource);
-        
-        System.out.println("Before the while");
         while (results.hasNext()) {
             System.out.println("Inside the while");
             QuerySolution solution = results.next();

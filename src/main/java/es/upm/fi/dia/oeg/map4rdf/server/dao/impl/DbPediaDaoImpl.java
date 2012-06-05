@@ -121,6 +121,9 @@ public class DbPediaDaoImpl extends CommonDaoImpl implements Map4rdfDao {
         @Override
         public List<GeoResource> getGeoResources(String modelConfiguration)
                         throws DaoException {
+                // TODO(jonathangsc): Uncomment this once the repository is uploaded.
+                // ShpToRdf shpConverter = new ShpToRdf(configuration);
+                // return RDFModelProcessor.processRdfModel(shpConverter.getRdfModel());
                 return RDFModelProcessor.parseRdfFile(modelConfiguration);
         }
 

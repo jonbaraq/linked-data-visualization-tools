@@ -70,7 +70,7 @@ public class FileUploadServlet extends HttpServlet {
              throw new IOException("The files cannot be downloaded."
                      + " Files on the repository don't have the right naming.");
         }
-
+        // Create directories needed to upload the files.
         directory.mkdirs();
         
         for (String key : filesToDownloadMap.keySet()) {
@@ -98,6 +98,7 @@ public class FileUploadServlet extends HttpServlet {
         if (!configurationFound) {
             resp.getWriter().print("Configuration file not found.");
             resp.flushBuffer();
+            return;
         }
         resp.getWriter().print("The files were created successfully: "
                 + directory.getAbsolutePath()
@@ -114,24 +115,32 @@ public class FileUploadServlet extends HttpServlet {
         ServletFileUpload upload = new ServletFileUpload(factory);
 
         // Parse the request.
-        try {  
+        try { 
             List<FileItem> items = upload.parseRequest(req);          
             for (FileItem fileItem : items) {
-                // Process only file upload
+                // Process only file upload.
                 if (fileItem.isFormField()) {
                     continue;
                 }
 
                 String fileName = fileItem.getName();
-                // Get only the file name not whole path
+                // Get only the file name not whole path.
                 if (fileName != null) {
                     fileName = FilenameUtils.getName(fileName);
+                    if (!fileName.endsWith(".zip")) {
+                        resp.getWriter().print("The file uploaded should be "
+                                + "a zip file with all the files needed to "
+                                + "build the model.");
+                        resp.flushBuffer();
+                        return;
+                    }
                 }
 
                 String uploadDirectory = createDirectory();
                 File uploadedFile = new File(uploadDirectory, fileName);
                 if (uploadedFile.createNewFile()) {
                     fileItem.write(uploadedFile);
+                    // Unzip the file.
                     String configurationFile =
                             unzipFile(uploadDirectory, fileName);
                     resp.setStatus(HttpServletResponse.SC_CREATED);
@@ -151,11 +160,10 @@ public class FileUploadServlet extends HttpServlet {
                 }
             }
         } catch (Exception e) {
-            System.out.println("An error occurred while creating the file : "
-                    + e.getMessage());
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     "An error occurred while creating the file : "
                     + e.getMessage());
+            resp.flushBuffer();
         }
    
     }
@@ -189,7 +197,7 @@ public class FileUploadServlet extends HttpServlet {
         return configurationFile;
     }
     
-    public void copyInputStream(InputStream in, String path)
+    private void copyInputStream(InputStream in, String path)
             throws IOException {
         BufferedWriter bw = new BufferedWriter(new FileWriter(new File(path)));
         
